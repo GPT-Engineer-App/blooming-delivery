@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Flower } from "lucide-react";
 
-const UNSPLASH_ACCESS_KEY = 'YOUR_UNSPLASH_ACCESS_KEY'; // Replace with your actual Unsplash access key
+const UNSPLASH_ACCESS_KEY = import.meta.env.VITE_UNSPLASH_ACCESS_KEY;
 
 const flowers = [
   { id: "roses", name: "Roses", price: 29.99 },
@@ -18,12 +18,17 @@ const flowers = [
 ];
 
 const fetchUnsplashImage = async (query) => {
-  const response = await fetch(`https://api.unsplash.com/photos/random?query=${query}&client_id=${UNSPLASH_ACCESS_KEY}`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch image');
+  try {
+    const response = await fetch(`https://api.unsplash.com/photos/random?query=${query}&client_id=${UNSPLASH_ACCESS_KEY}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch image');
+    }
+    const data = await response.json();
+    return data.urls.regular;
+  } catch (error) {
+    console.error('Error fetching Unsplash image:', error);
+    return null;
   }
-  const data = await response.json();
-  return data.urls.regular;
 };
 
 const FlowerSelection = () => {
@@ -31,7 +36,7 @@ const FlowerSelection = () => {
   const [quantity, setQuantity] = useState(1);
   const navigate = useNavigate();
 
-  const { data: flowerImage } = useQuery({
+  const { data: flowerImage, isLoading: imageLoading, error: imageError } = useQuery({
     queryKey: ['flowerImage', selectedFlower],
     queryFn: () => fetchUnsplashImage(selectedFlower),
   });
@@ -96,8 +101,18 @@ const FlowerSelection = () => {
               <CardTitle>Selected Flower</CardTitle>
             </CardHeader>
             <CardContent>
-              {flowerImage && (
+              {imageLoading ? (
+                <div className="w-full h-64 bg-gray-300 animate-pulse"></div>
+              ) : imageError ? (
+                <div className="w-full h-64 bg-gray-300 flex items-center justify-center">
+                  <p className="text-red-500">Failed to load image</p>
+                </div>
+              ) : flowerImage ? (
                 <img src={flowerImage} alt={selectedFlower} className="w-full h-64 object-cover rounded-md" />
+              ) : (
+                <div className="w-full h-64 bg-gray-300 flex items-center justify-center">
+                  <p className="text-gray-500">No image available</p>
+                </div>
               )}
             </CardContent>
           </Card>

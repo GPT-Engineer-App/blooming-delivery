@@ -4,21 +4,26 @@ import { Flower, Clock, Gift, Star } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 
-const UNSPLASH_ACCESS_KEY = 'YOUR_UNSPLASH_ACCESS_KEY'; // Replace with your actual Unsplash access key
+const UNSPLASH_ACCESS_KEY = import.meta.env.VITE_UNSPLASH_ACCESS_KEY;
 
 const fetchUnsplashImage = async (query) => {
-  const response = await fetch(`https://api.unsplash.com/photos/random?query=${query}&client_id=${UNSPLASH_ACCESS_KEY}`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch image');
+  try {
+    const response = await fetch(`https://api.unsplash.com/photos/random?query=${query}&client_id=${UNSPLASH_ACCESS_KEY}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch image');
+    }
+    const data = await response.json();
+    return data.urls.regular;
+  } catch (error) {
+    console.error('Error fetching Unsplash image:', error);
+    return null;
   }
-  const data = await response.json();
-  return data.urls.regular;
 };
 
 const Index = () => {
   const navigate = useNavigate();
 
-  const { data: heroImage, isLoading: heroImageLoading } = useQuery({
+  const { data: heroImage, isLoading: heroImageLoading, error: heroImageError } = useQuery({
     queryKey: ['heroImage'],
     queryFn: () => fetchUnsplashImage('flower bouquet'),
   });
@@ -48,6 +53,10 @@ const Index = () => {
       <section className="relative h-[600px] flex items-center justify-center">
         {heroImageLoading ? (
           <div className="absolute inset-0 bg-gray-300 animate-pulse"></div>
+        ) : heroImageError ? (
+          <div className="absolute inset-0 bg-gray-300 flex items-center justify-center">
+            <p className="text-red-500">Failed to load image</p>
+          </div>
         ) : (
           <img src={heroImage} alt="Flower bouquet" className="absolute inset-0 w-full h-full object-cover" />
         )}
@@ -113,7 +122,13 @@ const Index = () => {
 const ServiceCard = ({ icon, title, description, image }) => (
   <Card className="hover:shadow-lg transition-shadow duration-300 overflow-hidden">
     <div className="h-48 overflow-hidden">
-      <img src={image} alt={title} className="w-full h-full object-cover" />
+      {image ? (
+        <img src={image} alt={title} className="w-full h-full object-cover" />
+      ) : (
+        <div className="w-full h-full bg-gray-300 flex items-center justify-center">
+          <p className="text-gray-500">Image not available</p>
+        </div>
+      )}
     </div>
     <CardHeader>
       <CardTitle className="flex items-center gap-4 text-2xl">
