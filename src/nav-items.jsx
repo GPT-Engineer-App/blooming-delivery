@@ -1,5 +1,6 @@
 import { Home, Info, PhoneCall, Flower } from "lucide-react";
 import Index from "./pages/Index.jsx";
+import FlowerSelection from "./pages/FlowerSelection.jsx";
 
 /**
  * Central place for defining the navigation items. Used for navigation components and routing.
@@ -28,5 +29,11 @@ export const navItems = [
     to: "/contact",
     icon: <PhoneCall className="h-4 w-4" />,
     page: <div>Contact Page</div>,
+  },
+  {
+    title: "Order Flowers",
+    to: "/order",
+    icon: <Flower className="h-4 w-4" />,
+    page: <FlowerSelection />,
   },
 ];

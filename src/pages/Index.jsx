@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Flower, Clock, Gift, Star } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 
 const fetchUnsplashImage = async (query) => {
   const response = await fetch(`https://api.unsplash.com/photos/random?query=${query}&client_id=YOUR_UNSPLASH_ACCESS_KEY`);
@@ -13,10 +14,15 @@ const fetchUnsplashImage = async (query) => {
 };
 
 const Index = () => {
+  const navigate = useNavigate();
   const { data: heroImage, isLoading: heroImageLoading } = useQuery({
     queryKey: ['heroImage'],
     queryFn: () => fetchUnsplashImage('flower bouquet'),
   });
+
+  const handleOrderNow = () => {
+    navigate('/order');
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -31,7 +37,7 @@ const Index = () => {
         <div className="relative z-10 text-center text-white">
           <h1 className="text-5xl font-bold mb-6">Bloom Express</h1>
           <p className="text-xl mb-8">We deliver flowers to your doorstep in 30 minutes</p>
-          <Button size="lg" className="bg-pink-500 hover:bg-pink-600">Order Now</Button>
+          <Button size="lg" className="bg-pink-500 hover:bg-pink-600" onClick={handleOrderNow}>Order Now</Button>
         </div>
       </section>
 
