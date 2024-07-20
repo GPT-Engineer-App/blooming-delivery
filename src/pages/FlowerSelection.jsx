@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,44 +7,25 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Flower } from "lucide-react";
 
-const UNSPLASH_ACCESS_KEY = import.meta.env.VITE_UNSPLASH_ACCESS_KEY;
-
 const flowers = [
-  { id: "roses", name: "Roses", price: 29.99 },
-  { id: "tulips", name: "Tulips", price: 24.99 },
-  { id: "lilies", name: "Lilies", price: 27.99 },
-  { id: "sunflowers", name: "Sunflowers", price: 22.99 },
+  { id: "roses", name: "Roses", price: 29.99, image: "https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?auto=format&fit=crop&w=600&q=80" },
+  { id: "tulips", name: "Tulips", price: 24.99, image: "https://images.unsplash.com/photo-1520763185298-1b434c919102?auto=format&fit=crop&w=600&q=80" },
+  { id: "lilies", name: "Lilies", price: 27.99, image: "https://images.unsplash.com/photo-1588701107566-af76b932e2e8?auto=format&fit=crop&w=600&q=80" },
+  { id: "sunflowers", name: "Sunflowers", price: 22.99, image: "https://images.unsplash.com/photo-1597848212624-a19eb35e2651?auto=format&fit=crop&w=600&q=80" },
 ];
-
-const fetchUnsplashImage = async (query) => {
-  try {
-    const response = await fetch(`https://api.unsplash.com/photos/random?query=${query}&client_id=${UNSPLASH_ACCESS_KEY}`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch image');
-    }
-    const data = await response.json();
-    return data.urls.regular;
-  } catch (error) {
-    console.error('Error fetching Unsplash image:', error);
-    return null;
-  }
-};
 
 const FlowerSelection = () => {
   const [selectedFlower, setSelectedFlower] = useState(flowers[0].id);
   const [quantity, setQuantity] = useState(1);
   const navigate = useNavigate();
 
-  const { data: flowerImage, isLoading: imageLoading, error: imageError } = useQuery({
-    queryKey: ['flowerImage', selectedFlower],
-    queryFn: () => fetchUnsplashImage(selectedFlower),
-  });
-
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Order submitted:", { selectedFlower, quantity });
     navigate("/order-confirmation");
   };
+
+  const selectedFlowerData = flowers.find(flower => flower.id === selectedFlower);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -101,18 +81,12 @@ const FlowerSelection = () => {
               <CardTitle>Selected Flower</CardTitle>
             </CardHeader>
             <CardContent>
-              {imageLoading ? (
-                <div className="w-full h-64 bg-gray-300 animate-pulse"></div>
-              ) : imageError ? (
-                <div className="w-full h-64 bg-gray-300 flex items-center justify-center">
-                  <p className="text-red-500">Failed to load image</p>
-                </div>
-              ) : flowerImage ? (
-                <img src={flowerImage} alt={selectedFlower} className="w-full h-64 object-cover rounded-md" />
-              ) : (
-                <div className="w-full h-64 bg-gray-300 flex items-center justify-center">
-                  <p className="text-gray-500">No image available</p>
-                </div>
+              {selectedFlowerData && (
+                <img 
+                  src={selectedFlowerData.image} 
+                  alt={selectedFlowerData.name} 
+                  className="w-full h-64 object-cover rounded-md"
+                />
               )}
             </CardContent>
           </Card>

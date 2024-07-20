@@ -1,47 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Flower, Clock, Gift, Star } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-
-const UNSPLASH_ACCESS_KEY = import.meta.env.VITE_UNSPLASH_ACCESS_KEY;
-
-const fetchUnsplashImage = async (query) => {
-  try {
-    const response = await fetch(`https://api.unsplash.com/photos/random?query=${query}&client_id=${UNSPLASH_ACCESS_KEY}`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch image');
-    }
-    const data = await response.json();
-    return data.urls.regular;
-  } catch (error) {
-    console.error('Error fetching Unsplash image:', error);
-    return null;
-  }
-};
 
 const Index = () => {
   const navigate = useNavigate();
-
-  const { data: heroImage, isLoading: heroImageLoading, error: heroImageError } = useQuery({
-    queryKey: ['heroImage'],
-    queryFn: () => fetchUnsplashImage('flower bouquet'),
-  });
-
-  const { data: serviceImage1 } = useQuery({
-    queryKey: ['serviceImage1'],
-    queryFn: () => fetchUnsplashImage('flower delivery'),
-  });
-
-  const { data: serviceImage2 } = useQuery({
-    queryKey: ['serviceImage2'],
-    queryFn: () => fetchUnsplashImage('custom bouquet'),
-  });
-
-  const { data: serviceImage3 } = useQuery({
-    queryKey: ['serviceImage3'],
-    queryFn: () => fetchUnsplashImage('flower subscription'),
-  });
 
   const handleOrderNow = () => {
     navigate('/order');
@@ -51,15 +14,11 @@ const Index = () => {
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
       <section className="relative h-[600px] flex items-center justify-center">
-        {heroImageLoading ? (
-          <div className="absolute inset-0 bg-gray-300 animate-pulse"></div>
-        ) : heroImageError ? (
-          <div className="absolute inset-0 bg-gray-300 flex items-center justify-center">
-            <p className="text-red-500">Failed to load image</p>
-          </div>
-        ) : (
-          <img src={heroImage} alt="Flower bouquet" className="absolute inset-0 w-full h-full object-cover" />
-        )}
+        <img 
+          src="https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=1200&q=80" 
+          alt="Flower bouquet" 
+          className="absolute inset-0 w-full h-full object-cover"
+        />
         <div className="absolute inset-0 bg-black bg-opacity-50"></div>
         <div className="relative z-10 text-center text-white">
           <h1 className="text-5xl font-bold mb-6">Bloom Express</h1>
@@ -77,19 +36,19 @@ const Index = () => {
               icon={<Clock className="h-10 w-10 text-pink-500" />}
               title="Same Day Delivery"
               description="Get your flowers delivered within hours of ordering."
-              image={serviceImage1}
+              image="https://images.unsplash.com/photo-1556911220-bff31c812dba?auto=format&fit=crop&w=600&q=80"
             />
             <ServiceCard
               icon={<Flower className="h-10 w-10 text-pink-500" />}
               title="Custom Bouquets"
               description="Create your own unique floral arrangements."
-              image={serviceImage2}
+              image="https://images.unsplash.com/photo-1561181286-d3fee7d55364?auto=format&fit=crop&w=600&q=80"
             />
             <ServiceCard
               icon={<Gift className="h-10 w-10 text-pink-500" />}
               title="Subscription Plans"
               description="Regular flower deliveries to brighten your space."
-              image={serviceImage3}
+              image="https://images.unsplash.com/photo-1595536595137-e9b1e8b7d3f8?auto=format&fit=crop&w=600&q=80"
             />
           </div>
         </div>
@@ -122,13 +81,7 @@ const Index = () => {
 const ServiceCard = ({ icon, title, description, image }) => (
   <Card className="hover:shadow-lg transition-shadow duration-300 overflow-hidden">
     <div className="h-48 overflow-hidden">
-      {image ? (
-        <img src={image} alt={title} className="w-full h-full object-cover" />
-      ) : (
-        <div className="w-full h-full bg-gray-300 flex items-center justify-center">
-          <p className="text-gray-500">Image not available</p>
-        </div>
-      )}
+      <img src={image} alt={title} className="w-full h-full object-cover" />
     </div>
     <CardHeader>
       <CardTitle className="flex items-center gap-4 text-2xl">
