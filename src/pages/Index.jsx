@@ -4,8 +4,10 @@ import { Flower, Clock, Gift, Star } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 
+const UNSPLASH_ACCESS_KEY = 'YOUR_UNSPLASH_ACCESS_KEY'; // Replace with your actual Unsplash access key
+
 const fetchUnsplashImage = async (query) => {
-  const response = await fetch(`https://api.unsplash.com/photos/random?query=${query}&client_id=YOUR_UNSPLASH_ACCESS_KEY`);
+  const response = await fetch(`https://api.unsplash.com/photos/random?query=${query}&client_id=${UNSPLASH_ACCESS_KEY}`);
   if (!response.ok) {
     throw new Error('Failed to fetch image');
   }
@@ -15,9 +17,25 @@ const fetchUnsplashImage = async (query) => {
 
 const Index = () => {
   const navigate = useNavigate();
+
   const { data: heroImage, isLoading: heroImageLoading } = useQuery({
     queryKey: ['heroImage'],
     queryFn: () => fetchUnsplashImage('flower bouquet'),
+  });
+
+  const { data: serviceImage1 } = useQuery({
+    queryKey: ['serviceImage1'],
+    queryFn: () => fetchUnsplashImage('flower delivery'),
+  });
+
+  const { data: serviceImage2 } = useQuery({
+    queryKey: ['serviceImage2'],
+    queryFn: () => fetchUnsplashImage('custom bouquet'),
+  });
+
+  const { data: serviceImage3 } = useQuery({
+    queryKey: ['serviceImage3'],
+    queryFn: () => fetchUnsplashImage('flower subscription'),
   });
 
   const handleOrderNow = () => {
@@ -50,16 +68,19 @@ const Index = () => {
               icon={<Clock className="h-10 w-10 text-pink-500" />}
               title="Same Day Delivery"
               description="Get your flowers delivered within hours of ordering."
+              image={serviceImage1}
             />
             <ServiceCard
               icon={<Flower className="h-10 w-10 text-pink-500" />}
               title="Custom Bouquets"
               description="Create your own unique floral arrangements."
+              image={serviceImage2}
             />
             <ServiceCard
               icon={<Gift className="h-10 w-10 text-pink-500" />}
               title="Subscription Plans"
               description="Regular flower deliveries to brighten your space."
+              image={serviceImage3}
             />
           </div>
         </div>
@@ -89,8 +110,11 @@ const Index = () => {
   );
 };
 
-const ServiceCard = ({ icon, title, description }) => (
-  <Card className="hover:shadow-lg transition-shadow duration-300">
+const ServiceCard = ({ icon, title, description, image }) => (
+  <Card className="hover:shadow-lg transition-shadow duration-300 overflow-hidden">
+    <div className="h-48 overflow-hidden">
+      <img src={image} alt={title} className="w-full h-full object-cover" />
+    </div>
     <CardHeader>
       <CardTitle className="flex items-center gap-4 text-2xl">
         {icon}
